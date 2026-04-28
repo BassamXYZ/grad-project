@@ -31,15 +31,15 @@ def generate_launch_description():
         ]
     )
 
-    twist_mux_params = os.path.join(
-        get_package_share_directory(package_name), 'config', 'twist_mux.yaml'
-    )
-    twist_mux = Node(
-        package='twist_mux',
-        executable='twist_mux',
-        parameters=[twist_mux_params, {'use_sim_time': True}],
-        remappings=[('/cmd_vel_out', '/diff_cont/cmd_vel_unstamped')]
-    )
+#    twist_mux_params = os.path.join(
+#        get_package_share_directory(package_name), 'config', 'twist_mux.yaml'
+#    )
+#    twist_mux = Node(
+#        package='twist_mux',
+#        executable='twist_mux',
+#        parameters=[twist_mux_params, {'use_sim_time': True}],
+#        remappings=[('/cmd_vel_out', '/diff_cont/cmd_vel_unstamped')]
+#    )
 
     spawn_entity = Node(
         package='ros_gz_sim',
@@ -63,7 +63,7 @@ def generate_launch_description():
             '--param-file',
             robot_controllers,
             '--controller-ros-args',
-            '-r /diff_drive_controller/cmd_vel:=/cmd_vel',
+            '-r /diff_drive_base_controller/cmd_vel:=/cmd_vel',
         ],
     )
 
@@ -87,7 +87,7 @@ def generate_launch_description():
 
     ld = LaunchDescription([
         rsp,
-        twist_mux,
+        #twist_mux,
         IncludeLaunchDescription(
             PythonLaunchDescriptionSource(
                 [PathJoinSubstitution([FindPackageShare('ros_gz_sim'),

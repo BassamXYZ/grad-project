@@ -6,13 +6,13 @@ from launch.actions import DeclareLaunchArgument
 
 def generate_launch_description():
     use_sim_time = LaunchConfiguration('use_sim_time')
-    
+
     teleop_keyboard = Node(
         package='teleop_twist_keyboard',
         executable='teleop_twist_keyboard',
         name='teleop_twist_keyboard',
         output='screen',
-        parameters=[{'use_sim_time': use_sim_time}],
+        parameters=[{'use_sim_time': use_sim_time}, {'stamped': True}, {'frame_id': 'chassis'}],
         remappings=[('/cmd_vel', '/cmd_vel_joy')]
     )
 

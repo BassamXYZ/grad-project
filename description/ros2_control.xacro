@@ -67,9 +67,6 @@
                 name="gz_ros2_control::GazeboSimROS2ControlPlugin">
             <parameters>$(find grad-project)/config/my_controllers.yaml</parameters>
             <parameters>$(find grad-project)/config/gaz_ros2_ctl_use_sim.yaml</parameters>
-            <!-- FIX: auto-activate controllers on robot spawn -->
-            <controller_manager_prefix_node_name>controller_manager</controller_manager_prefix_node_name>
-            <activate_controllers_on_start>diff_cont joint_broad</activate_controllers_on_start>
         </plugin>
     </gazebo>
 </robot>

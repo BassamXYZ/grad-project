@@ -3,63 +3,43 @@ import os
 from ament_index_python.packages import get_package_share_directory
 
 from launch import LaunchDescription
-from launch.actions import IncludeLaunchDescription
+from launch.actions import IncludeLaunchDescription, TimerAction, LogInfo
 from launch.launch_description_sources import PythonLaunchDescriptionSource
 from launch_ros.actions import Node
-from launch.actions import TimerAction
 
 
 def generate_launch_description():
 
-    package_name='grad-project'
+    package_name = 'grad-project'
 
     rsp = IncludeLaunchDescription(
         PythonLaunchDescriptionSource([
-            os.path.join(
-                get_package_share_directory(package_name),
-                'launch',
-                'rsp.launch.py'
-            )
-        ]),
-        launch_arguments={'use_sim_time': 'true'}.items()
-    )
-
-    joystick = IncludeLaunchDescription(
-        PythonLaunchDescriptionSource([
-            os.path.join(
-                get_package_share_directory(package_name),
-                'launch',
-                'joystick.launch.py'
-            )
+            os.path.join(get_package_share_directory(package_name),
+                         'launch', 'rsp.launch.py')
         ]),
         launch_arguments={'use_sim_time': 'true'}.items()
     )
 
     twist_mux_params = os.path.join(
-        get_package_share_directory(package_name),
-        'config',
-        'twist_mux.yaml'
+        get_package_share_directory(package_name), 'config', 'twist_mux.yaml'
     )
     twist_mux = Node(
-        package="twist_mux",
-        executable="twist_mux",
+        package='twist_mux',
+        executable='twist_mux',
         parameters=[twist_mux_params, {'use_sim_time': True}],
         remappings=[('/cmd_vel_out', '/diff_cont/cmd_vel_unstamped')]
     )
 
-
-    # gz_params = os.path.join(get_package_share_directory(package_name),'config','gazebo_params.yaml')
+    world_file = os.path.join(
+        get_package_share_directory(package_name), 'worlds', 'sim.world'
+    )
     gz_sim = IncludeLaunchDescription(
         PythonLaunchDescriptionSource([
-            os.path.join(
-                get_package_share_directory('ros_gz_sim'),
-                'launch',
-                'gz_sim.launch.py'
-            )
+            os.path.join(get_package_share_directory('ros_gz_sim'),
+                         'launch', 'gz_sim.launch.py')
         ]),
         launch_arguments={
-            # 'extra_gazebo_args': '--ros-args --params-file ' + gz_params,
-            'gz_args': '-r empty.sdf',
+            'gz_args': f'-r -v4 {world_file}',   # uses our world with proper plugins
             'on_exit_shutdown': 'true'
         }.items()
     )
@@ -67,18 +47,12 @@ def generate_launch_description():
     spawn_entity = Node(
         package='ros_gz_sim',
         executable='create',
-        arguments=[
-            '-topic', '/robot_description',
-            '-name', 'amr',
-            '-z', '0.3'
-        ],
+        arguments=['-topic', '/robot_description', '-name', 'amr', '-z', '0.1'],
         output='screen'
     )
-    spawn_entity_delayed = TimerAction(
-        period=20.0,   # seconds – increase if your machine is slow
-        actions=[spawn_entity]
-    )
-    
+    # Spawn after Gazebo is ready; gz_ros2_control auto-activates controllers
+    spawn_entity_delayed = TimerAction(period=10.0, actions=[spawn_entity])
+
     clock_bridge = Node(
         package='ros_gz_bridge',
         executable='parameter_bridge',
@@ -86,11 +60,19 @@ def generate_launch_description():
         output='screen'
     )
 
+    camera_bridge = Node(
+        package='ros_gz_image',
+        executable='image_bridge',
+        arguments=['/camera/image_raw'],
+        output='screen'
+    )
+
     return LaunchDescription([
         rsp,
-        joystick,
         twist_mux,
         gz_sim,
         spawn_entity_delayed,
         clock_bridge,
+        camera_bridge,
+        LogInfo(msg='=== After launch, run in a new terminal: ros2 run teleop_twist_keyboard teleop_twist_keyboard --ros-args -r /cmd_vel:=/cmd_vel_joy ==='),
     ])

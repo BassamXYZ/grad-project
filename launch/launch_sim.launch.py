@@ -74,5 +74,4 @@ def generate_launch_description():
         spawn_entity_delayed,
         clock_bridge,
         camera_bridge,
-        LogInfo(msg='=== After launch, run in a new terminal: ros2 run teleop_twist_keyboard teleop_twist_keyboard --ros-args -r /cmd_vel:=/cmd_vel_joy ==='),
     ])

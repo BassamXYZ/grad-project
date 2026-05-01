@@ -1,7 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
 <robot xmlns:xacro="http://www.ros.org/wiki/xacro">
-
-    <!-- <xacro:include filename="inertial_macros.xacro"/> -->
  
     <xacro:property name="chassis_length" value="0.4"/>
     <xacro:property name="chassis_width" value="0.3"/>
@@ -11,9 +9,9 @@
     <xacro:property name="wheel_thickness" value="0.03"/>
     <xacro:property name="wheel_mass" value="0.5"/>
     <!--
-    <xacro:property name="wheel_offset_x" value="0.226"/>
-    <xacro:property name="wheel_offset_y" value="0.1485"/>
-    <xacro:property name="wheel_offset_z" value="0.01"/>
+    <xacro:property name="wheel_offset_x" value=""/>
+    <xacro:property name="wheel_offset_y" value=""/>
+    <xacro:property name="wheel_offset_z" value=""/>
     -->
 
 
@@ -66,14 +64,10 @@
     <inertial>
       <origin xyz="0 0 0" rpy="0 0 0"/>
       <mass value="${chassis_mass}"/>
-      <!-- Inertia for a uniform box: Ixx = (m/12)*(y^2+z^2), etc. -->
       <inertia ixx="0.09375" ixy="0.0" ixz="0.0"
                iyy="0.15208" iyz="0.0"
                izz="0.20833"/>
     </inertial>
-    <!-- <xacro:inertial_box mass="0.5" x="${chassis_length}" y="${chassis_width}" z="${chassis_height}">
-            <origin xyz="${chassis_length/2} 0 ${chassis_height/2}" rpy="0 0 0"/>
-         </xacro:inertial_box> -->
   </link>
 
     <gazebo reference="chassis">
@@ -97,21 +91,17 @@
     <inertial>
       <origin xyz="0 0 0" rpy="0 0 0"/>
       <mass value="${wheel_mass}"/>
-      <!-- Cylinder axis along y: Iyy = 0.5*m*r^2, Ixx = Izz = (m/12)*(3r^2 + L^2) -->
       <inertia ixx="0.0004875" ixy="0.0" ixz="0.0"
                iyy="0.0009"    iyz="0.0"
                izz="0.0004875"/>
     </inertial>
-    <!-- <xacro:inertial_cylinder mass="${wheel_mass}" length="${wheel_thickness}" radius="${wheel_radius}">
-            <origin xyz="0 0 0" rpy="0 0 0"/>
-         </xacro:inertial_cylinder> -->
   </link>
   
   <joint name="left_wheel_joint" type="continuous">
     <parent link="chassis"/>
     <child link="left_wheel"/>
-    <origin xyz="0 -0.165 -0.055" rpy="-${pi/2} 0 0"/>
-    <axis xyz="0 0 -1"/>
+    <origin xyz="0 -0.165 -0.055" rpy="${pi/2} 0 0"/>
+    <axis xyz="0 0 1"/>
   </joint>
   
   <gazebo reference="left_wheel">
@@ -138,21 +128,17 @@
                iyy="0.0009"    iyz="0.0"
                izz="0.0004875"/>
     </inertial>
-    <!-- <xacro:inertial_cylinder mass="${wheel_mass}" length="${wheel_thickness}" radius="${wheel_radius}">
-            <origin xyz="0 0 0" rpy="0 0 0"/>
-         </xacro:inertial_cylinder> -->
   </link>
   
   <joint name="right_wheel_joint" type="continuous">
     <parent link="chassis"/>
     <child link="right_wheel"/>
     <origin xyz="0 0.165 -0.055" rpy="${pi/2} 0 0"/>
-    <!-- <origin xyz="0 ${wheel_offset_y} 0" rpy="${pi/2} 0 0" /> -->
-    <axis xyz="0 0 -1"/>
+    <axis xyz="0 0 1"/>
   </joint>
   
   <gazebo reference="right_wheel">
-      <material>Ignition/Blue</material>
+      <material>Gazebo/Blue</material>
   </gazebo>
 
   <!-- ===== SUPPORT WHEELS (casters, modeled as spheres) ===== -->
@@ -172,17 +158,22 @@
     <inertial>
       <origin xyz="0 0 0" rpy="0 0 0"/>
       <mass value="0.1"/>
-      <!-- Solid sphere inertia: (2/5)*m*r^2 -->
       <inertia ixx="0.000016" ixy="0.0" ixz="0.0"
                iyy="0.000016" iyz="0.0"
                izz="0.000016"/>
     </inertial>
   </link>
+  
   <joint name="support_front_left_joint" type="fixed">
     <parent link="chassis"/>
     <child link="support_front_left"/>
     <origin xyz="0.2 0.15 -0.095" rpy="0 0 0"/>
   </joint>
+  
+  <gazebo reference="support_front_left">
+    <mu1>0.01</mu1>
+    <mu2>0.01</mu2>
+  </gazebo>
 
   <!-- Front right corner (x = +0.2, y = -0.15) -->
   <link name="support_front_right">
@@ -205,11 +196,17 @@
                izz="0.000016"/>
     </inertial>
   </link>
+  
   <joint name="support_front_right_joint" type="fixed">
     <parent link="chassis"/>
     <child link="support_front_right"/>
     <origin xyz="0.2 -0.15 -0.095" rpy="0 0 0"/>
   </joint>
+
+  <gazebo reference="support_front_right">
+    <mu1>0.01</mu1>
+    <mu2>0.01</mu2>
+  </gazebo>
 
   <!-- Back left corner (x = -0.2, y = +0.15) -->
   <link name="support_back_left">
@@ -232,11 +229,17 @@
                izz="0.000016"/>
     </inertial>
   </link>
+  
   <joint name="support_back_left_joint" type="fixed">
     <parent link="chassis"/>
     <child link="support_back_left"/>
     <origin xyz="-0.2 0.15 -0.095" rpy="0 0 0"/>
   </joint>
+
+  <gazebo reference="support_back_left">
+    <mu1>0.01</mu1>
+    <mu2>0.01</mu2>
+  </gazebo>
 
   <!-- Back right corner (x = -0.2, y = -0.15) -->
   <link name="support_back_right">
@@ -259,9 +262,15 @@
                izz="0.000016"/>
     </inertial>
   </link>
+  
   <joint name="support_back_right_joint" type="fixed">
     <parent link="chassis"/>
     <child link="support_back_right"/>
     <origin xyz="-0.2 -0.15 -0.095" rpy="0 0 0"/>
   </joint>
+  
+  <gazebo reference="support_back_right">
+    <mu1>0.01</mu1>
+    <mu2>0.01</mu2>
+  </gazebo>
 </robot>

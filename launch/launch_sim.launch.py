@@ -1,14 +1,14 @@
 import os
-from ament_index_python.packages import get_package_share_directory
 
-from launch.launch_description_sources import PythonLaunchDescriptionSource
-from launch_ros.actions import Node
 from launch import LaunchDescription
-from launch.actions import DeclareLaunchArgument, IncludeLaunchDescription, OpaqueFunction
+from launch_ros.actions import Node
 from launch.actions import RegisterEventHandler
 from launch.event_handlers import OnProcessExit
-from launch.substitutions import Command, FindExecutable, LaunchConfiguration, PathJoinSubstitution
 from launch_ros.substitutions import FindPackageShare
+from ament_index_python.packages import get_package_share_directory
+from launch.launch_description_sources import PythonLaunchDescriptionSource
+from launch.actions import DeclareLaunchArgument, IncludeLaunchDescription, OpaqueFunction
+from launch.substitutions import Command, FindExecutable, LaunchConfiguration, PathJoinSubstitution
 
 
 def generate_launch_description():
@@ -66,11 +66,17 @@ def generate_launch_description():
             '-r /diff_drive_base_controller/cmd_vel:=/cmd_vel',
         ],
     )
-
+    
     clock_bridge = Node(
         package='ros_gz_bridge',
         executable='parameter_bridge',
-        arguments=['/clock@rosgraph_msgs/msg/Clock[gz.msgs.Clock'],
+        arguments=[
+            '/clock@rosgraph_msgs/msg/Clock[gz.msgs.Clock',
+            '/imu@sensor_msgs/msg/Imu[gz.msgs.IMU'
+            ],
+        remappings=[
+            ('/imu', '/imu/data')
+        ],
         output='screen'
     )
 
@@ -80,10 +86,11 @@ def generate_launch_description():
         arguments=['/camera/image_raw'],
         output='screen'
     )
-
+    
     world_file = os.path.join(
         get_package_share_directory(package_name), 'worlds', 'obstacles.world'
     )
+    
 
     ld = LaunchDescription([
         rsp,
@@ -111,3 +118,4 @@ def generate_launch_description():
         camera_bridge,
     ])
     return ld
+

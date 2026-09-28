@@ -1,31 +1,31 @@
 <?xml version="1.0"?>
 <robot xmlns:xacro="http://www.ros.org/wiki/xacro">
   <xacro:unless value="$(arg sim_mode)">
-    <ros2_control name="Esp32DiffDrive" type="system">
-      <hardware>
-        <plugin>esp32_diff_hw_interface/Esp32DiffHwInterface</plugin>
-        <!--
-        <param name="left_wheel_name">left_wheel_joint</param>
-        <param name="right_wheel_name">right_wheel_joint</param>
-        -->
-      </hardware>
-      <joint name="left_wheel_joint">
-        <command_interface name="velocity">
-          <param name="min">-10.0</param>
-          <param name="max"> 10.0</param>
-        </command_interface>
-        <state_interface name="position"/>
-        <state_interface name="velocity"/>
-      </joint>
-      <joint name="right_wheel_joint">
-        <command_interface name="velocity">
-          <param name="min">-10.0</param>
-          <param name="max"> 10.0</param>
-        </command_interface>
-        <state_interface name="position"/>
-        <state_interface name="velocity"/>
-      </joint>
-    </ros2_control>
+<ros2_control name="EspDiffDrive" type="system">
+  <hardware>
+    <plugin>esp_diff_interface/esp_diff</plugin>
+    <param name="left_wheel_name">left_wheel_joint</param>
+    <param name="right_wheel_name">right_wheel_joint</param>
+  </hardware>
+
+  <joint name="left_wheel_joint">
+    <command_interface name="velocity">
+      <param name="min">-0.7</param>
+      <param name="max">0.7</param>
+    </command_interface>
+    <state_interface name="position"/>
+    <state_interface name="velocity"/>
+  </joint>
+
+  <joint name="right_wheel_joint">
+    <command_interface name="velocity">
+      <param name="min">-0.7</param>
+      <param name="max">0.7</param>
+    </command_interface>
+    <state_interface name="position"/>
+    <state_interface name="velocity"/>
+  </joint>
+</ros2_control>
   </xacro:unless>
 
   <xacro:if value="$(arg sim_mode)">

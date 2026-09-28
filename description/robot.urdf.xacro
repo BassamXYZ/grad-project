@@ -3,6 +3,7 @@
 
     <xacro:arg name="sim_mode" default="False"/>
 
+    <xacro:include filename="inertial_macros.xacro" />
     <xacro:include filename="robot_core.xacro" />
     <xacro:include filename="camera.xacro" />    
     <xacro:include filename="ros2_control.xacro" />
